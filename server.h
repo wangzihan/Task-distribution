@@ -8,9 +8,17 @@
 #include "netinet/in.h"
 #include "sys/wait.h"
 #include "arpa/inet.h"
-
+#include "list"
 #include "log.h"
 
-#define SERVPORT 3333
-#define BACKLOG 10
-#define MAXSIZE 1024
+struct module
+{
+    string ip;
+    string port;
+};
+
+struct lists
+{
+    list<struct module> idle;
+    list<struct module> busy;
+};

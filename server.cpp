@@ -1,17 +1,22 @@
 #include "server.h"
 
+#define BACKLOG 10
+#define MAXSIZE 1024
+
 using namespace std;
 
-int main(int argc, char * argv[])
+bool * add_module(struct lists)
 {
-    log * msg = new log();
+    /*log * msg = new log();
 
-    string port = "10086";
-    cout<<"please input port(default 10086):";
-    cin>>port;
-    cout<<port<<endl;
+    int SERVPORT = 3333;
+    cout<<"please input port(default 3333):";
+    int tmp = 0;
+    cin>>tmp;
+    if(tmp > 0)SERVPORT = tmp;
+    cout<<SERVPORT<<endl;
 
-    msg->common("server port set ",port);
+    //msg->common("server port set ");*/
 
     int sockfd, client_fd;
     struct sockaddr_in my_addr;
@@ -19,7 +24,7 @@ int main(int argc, char * argv[])
 
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-        perror("socket create failed!");
+        perror("add_modulesocket create failed!");
 	exit(1);
     }
 
@@ -29,12 +34,12 @@ int main(int argc, char * argv[])
     bzero(&(my_addr.sin_zero),8);
     if(bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
     {
-        perror("bind error!");
+        perror("add_module bind error!");
 	exit(1);
     }
     if(listen(sockfd, BACKLOG) == -1)
     {
-        perror("listen error!");
+        perror("add_modulelisten error!");
 	exit(1);
     }
 
@@ -58,7 +63,7 @@ int main(int argc, char * argv[])
 		continue;
 	    }
 
-	    char * msg = "Hello, you are connected!\n";
+	    char * msg = "connected!";
 	    if(send(client_fd, msg, strlen(msg),0) == -1)
 	        perror("send error!");
 	    close(client_fd);
@@ -66,4 +71,12 @@ int main(int argc, char * argv[])
 	}
 	close(client_fd);
     }
+}
+
+int main(int argc, char * argv[])
+{
+    pthread_t addtid;
+    int err;
+    lists *mods = new lists();
+    err = pthread_create(&addtid, NULL, add_module, void * mods);
 }

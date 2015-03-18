@@ -8,10 +8,7 @@
 #include "netinet/in.h"
 #include "sys/wait.h"
 #include "arpa/inet.h"
+#include "list"
 
 #include "log.h"
 
-#define SERVPORT 3333  
-#define MAXDATASIZE 100  
-#define SERVER_IP "127.0.0.1"  
-#define DATA  "this is a client message"  
