@@ -5,6 +5,7 @@
 #include "stdlib.h"
 #include "errno.h"
 #include "string.h"
+#include "string"
 #include "netinet/in.h"
 #include "sys/wait.h"
 #include "arpa/inet.h"
@@ -13,12 +14,6 @@
 
 struct module
 {
-    string ip;
-    string port;
-};
-
-struct lists
-{
-    list<struct module> idle;
-    list<struct module> busy;
+    std::string ip;
+    int port;
 };

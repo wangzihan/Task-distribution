@@ -1,11 +1,12 @@
 #include "server.h"
+#include "unistd.h"
 
 #define BACKLOG 10
 #define MAXSIZE 1024
 
 using namespace std;
 
-bool * add_module(struct lists)
+void * add_module(void * args)
 {
     /*log * msg = new log();
 
@@ -18,6 +19,7 @@ bool * add_module(struct lists)
 
     //msg->common("server port set ");*/
 
+    int SERVPORT = 3333;
     int sockfd, client_fd;
     struct sockaddr_in my_addr;
     struct sockaddr_in remote_addr;
@@ -31,7 +33,8 @@ bool * add_module(struct lists)
     my_addr.sin_family = AF_INET;
     my_addr.sin_port = htons(SERVPORT);
     my_addr.sin_addr.s_addr = INADDR_ANY;
-    bzero(&(my_addr.sin_zero),8);
+//    bzero(&(my_addr.sin_zero),8);
+    memset(&my_addr.sin_zero, 0, sizeof(my_addr.sin_zero));
     if(bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
     {
         perror("add_module bind error!");
@@ -52,8 +55,28 @@ bool * add_module(struct lists)
 	    continue;
 	}
 	printf("Received a connection from %s\n",(char *)inet_ntoa(remote_addr.sin_addr));
+        char * msg = "connected!";
+        if(send(client_fd, msg, strlen(msg),0) == -1)
+        {
+            perror("send error!");
+            close(client_fd);
+            continue;
+        }
+       
+        list<module*> * mods = (list<module*>*)args;          //将新连接上的客户端添加进mods
+        module * tmp = new module();
+        tmp->ip = inet_ntoa(remote_addr.sin_addr);
+        tmp->port = remote_addr.sin_port;
+        mods->push_back(tmp);
 
-	if(!fork())
+        cout<<tmp->ip<<" "<<tmp->port<<endl;
+
+        list<module*>::iterator i = mods->begin();
+        cout<<(*i)->ip<<endl;
+        cout<<(*i)->port<<endl;
+        cout<<mods->size()<<endl;
+
+	/*if(!fork())
 	{
 	    int rval;
 	    char buf[MAXSIZE];
@@ -69,7 +92,7 @@ bool * add_module(struct lists)
 	    close(client_fd);
 	    exit(0);
 	}
-	close(client_fd);
+	close(client_fd);*/
     }
 }
 
@@ -77,6 +100,16 @@ int main(int argc, char * argv[])
 {
     pthread_t addtid;
     int err;
-    lists *mods = new lists();
-    err = pthread_create(&addtid, NULL, add_module, void * mods);
+    list<module*> mods;
+    if((err = pthread_create(&addtid, NULL, add_module, (void *)&mods)) != 0)
+    {
+        perror("connect server error!");
+        exit(1);
+    }
+    
+    sleep(10);
+    list<module*>::iterator i = mods.begin();
+    cout<<(*i)->ip<<endl;
+    cout<<(*i)->port<<endl;
+    cout<<mods.size()<<endl;
 }
