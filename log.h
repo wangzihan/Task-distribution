@@ -4,6 +4,7 @@
 
 class log
 {
+
 private:
     char * lfile;
     std::ofstream ofile;
